@@ -43,6 +43,11 @@ def new_game():
     grid = [[numbers.pop() for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
     return grid
 
+# Функція для малювання п'ятнашок
+def draw_tiles(screen, tiles):
+    for tile in tiles:
+        tile.draw(screen)
+
 # Головна функція гри
 def main():
     pygame.init()
@@ -64,8 +69,7 @@ def main():
 
         screen.fill(BLACK)
 
-        for tile in tiles:
-            tile.draw(screen)
+        draw_tiles(screen, tiles)
 
         pygame.display.flip()
 
