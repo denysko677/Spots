@@ -50,6 +50,18 @@ def get_valid_neighbors(index):
             neighbors.append(new_row * GRID_SIZE + new_col)
     return neighbors
 
+def check_win(tiles):
+    for tile in tiles:
+        if tile.number != tile.row * GRID_SIZE + tile.col + 1:
+            return False
+    return True
+
+def display_message(screen, message):
+    font = pygame.font.Font(None, 40)
+    text = font.render(message, True, WHITE)
+    text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+    screen.blit(text, text_rect)
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -73,6 +85,8 @@ def main():
                     if clicked_tile_index in get_valid_neighbors(empty_tile_index):
                         tiles[empty_tile_index], tiles[clicked_tile_index] = tiles[clicked_tile_index], tiles[empty_tile_index]
                         empty_tile_index = clicked_tile_index
+                        if check_win(tiles):
+                            display_message(screen, "You win!")
 
         screen.fill(BLACK)
         for tile in tiles:
