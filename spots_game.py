@@ -50,17 +50,12 @@ def get_valid_neighbors(index):
             neighbors.append(new_row * GRID_SIZE + new_col)
     return neighbors
 
-def check_win(tiles):
-    for tile in tiles:
-        if tile.number != tile.row * GRID_SIZE + tile.col + 1:
-            return False
-    return True
-
-def display_message(screen, message):
-    font = pygame.font.Font(None, 40)
-    text = font.render(message, True, WHITE)
-    text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
-    screen.blit(text, text_rect)
+def shuffle_tiles(tiles, empty_tile_index, steps=100):
+    for _ in range(steps):
+        valid_neighbors = get_valid_neighbors(empty_tile_index)
+        random_neighbor_index = random.choice(valid_neighbors)
+        tiles[empty_tile_index], tiles[random_neighbor_index] = tiles[random_neighbor_index], tiles[empty_tile_index]
+        empty_tile_index = random_neighbor_index
 
 def main():
     pygame.init()
@@ -72,6 +67,8 @@ def main():
     tiles = [Tile(grid[row][col], row, col) for row in range(GRID_SIZE) for col in range(GRID_SIZE)]
 
     empty_tile_index = GRID_SIZE ** 2 - 1
+
+    shuffle_tiles(tiles, empty_tile_index)
 
     while True:
         for event in pygame.event.get():
@@ -85,8 +82,6 @@ def main():
                     if clicked_tile_index in get_valid_neighbors(empty_tile_index):
                         tiles[empty_tile_index], tiles[clicked_tile_index] = tiles[clicked_tile_index], tiles[empty_tile_index]
                         empty_tile_index = clicked_tile_index
-                        if check_win(tiles):
-                            display_message(screen, "You win!")
 
         screen.fill(BLACK)
         for tile in tiles:
