@@ -1,5 +1,3 @@
-# game.py
-
 import pygame
 import sys
 import random
@@ -43,10 +41,25 @@ def new_game():
     grid = [[numbers.pop() for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
     return grid
 
-# Функція для малювання п'ятнашок
-def draw_tiles(screen, tiles):
-    for tile in tiles:
-        tile.draw(screen)
+# Функція для обробки подій
+def handle_events(tiles):
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # ЛКМ
+            x, y = pygame.mouse.get_pos()
+            col = x // (SCREEN_WIDTH // GRID_SIZE)
+            row = y // (SCREEN_HEIGHT // GRID_SIZE)
+            index = row * GRID_SIZE + col
+            if index >= 0 and index < GRID_SIZE ** 2:
+                tile = tiles[index]
+                empty_tile = [t for t in tiles if t.number == 0][0]
+                if (tile.row == empty_tile.row and abs(tile.col - empty_tile.col) == 1) or \
+                        (tile.col == empty_tile.col and abs(tile.row - empty_tile.row) == 1):
+                    tile.row, empty_tile.row = empty_tile.row, tile.row
+                    tile.col, empty_tile.col = empty_tile.col, tile.col
+                    tiles[index], tiles[tiles.index(empty_tile)] = tiles[tiles.index(empty_tile)], tiles[index]
 
 # Головна функція гри
 def main():
@@ -61,17 +74,18 @@ def main():
         for col in range(GRID_SIZE):
             tiles.append(Tile(grid[row][col], row, col))
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+    clock = pygame.time.Clock()
 
+    while True:
+        handle_events(tiles)
+        
         screen.fill(BLACK)
 
-        draw_tiles(screen, tiles)
+        for tile in tiles:
+            tile.draw(screen)
 
         pygame.display.flip()
+        clock.tick(30)
 
 if __name__ == "__main__":
     main()
